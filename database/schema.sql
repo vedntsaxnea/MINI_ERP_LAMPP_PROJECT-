@@ -45,9 +45,9 @@ CREATE TABLE `emplyee` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `passwort` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `Role` enum('admin','employee') NOT NULL DEFAULT 'employee',
-  `Created_at` timestamp NOT NULL DEFAULT curtime()
+  `Created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
