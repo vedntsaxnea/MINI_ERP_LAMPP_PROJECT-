@@ -24,16 +24,16 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `emplyee`
+-- Table structure for table `employees`
 --
 
-CREATE TABLE `emplyee` (
+CREATE TABLE `employees` (
   `id` int(11) NOT NULL,
-  `User_id` int(11) NOT NULL,
-  `First_Name` varchar(55) NOT NULL,
-  `Last_Name` varchar(55) NOT NULL,
-  `Phone_no` int(13) NOT NULL,
-  `Position` varchar(50) DEFAULT NULL
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(55) NOT NULL,
+  `last_name` varchar(55) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `position` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -55,11 +55,11 @@ CREATE TABLE `users` (
 --
 
 --
--- Indexes for table `emplyee`
+-- Indexes for table `employees`
 --
-ALTER TABLE `emplyee`
+ALTER TABLE `employees`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `User_id` (`User_id`);
+  ADD UNIQUE KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `users`
@@ -73,9 +73,9 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `emplyee`
+-- AUTO_INCREMENT for table `employees`
 --
-ALTER TABLE `emplyee`
+ALTER TABLE `employees`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -89,10 +89,10 @@ ALTER TABLE `users`
 --
 
 --
--- Constraints for table `emplyee`
+-- Constraints for table `employees`
 --
-ALTER TABLE `emplyee`
-  ADD CONSTRAINT `emplyee_ibfk_1` FOREIGN KEY (`User_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `employees`
+  ADD CONSTRAINT `employees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
