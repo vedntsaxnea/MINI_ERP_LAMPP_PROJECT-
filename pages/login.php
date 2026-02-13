@@ -41,12 +41,12 @@ if (!isset($_SESSION['csrf_token'])) {
         <form action="auth_login.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
             <div class="form-group">
-                <label for="email">Email:</label>
+                <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="Email" required>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <label for="password">Password </label>
+                <input type="password" id="password" name="password"  placeholder="Password" required>
             </div>
             <button type="submit">Login</button>
         </form>

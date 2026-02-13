@@ -20,7 +20,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 <body>
     <div class="dashboard-container">
         <header>
-            <h1>Welcome to Mini ERP Dashboard</h1>
+            <h1>Welcome to MiniERP Dashboard</h1>
             <div class="user-info">
                 <span>Logged in as: <strong><?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?></strong></span>
                 <span>Role: <strong><?php echo htmlspecialchars($_SESSION['role'], ENT_QUOTES, 'UTF-8'); ?></strong></span>
