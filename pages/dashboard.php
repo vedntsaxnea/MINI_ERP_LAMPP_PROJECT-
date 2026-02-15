@@ -31,14 +31,32 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <nav class="main-nav">
             <ul>
                 <li><a href="dashboard.php" class="active">Dashboard</a></li>
-                <li><a href="employees.php">Employees</a></li>
+                <?php if ($_SESSION['role'] == 'admin'): ?>
+                    <li><a href="employees.php">Employees</a></li>
+                    <li><a href="projects.php">Projects</a></li>
+                    <li><a href="tasks.php">Tasks</a></li>
+                <?php else: ?>
+                    <li><a href="my_tasks.php">My Tasks</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
         
         <main>
             <div class="dashboard-content">
                 <h2>Dashboard Overview</h2>
-                <p>Welcome to your Mini ERP system. Select a menu option to get started.</p>
+                <?php if ($_SESSION['role'] == 'admin'): ?>
+                    <p>Welcome to your Mini ERP system. Select a menu option to get started.</p>
+                    <div style="margin-top: 30px;">
+                        <a href="employees.php" class="btn btn-primary" style="margin-right: 10px; text-decoration: none; color: #ffffff;">Manage Employees</a>
+                        <a href="projects.php" class="btn btn-primary" style="margin-right: 10px; text-decoration: none; color: #ffffff;">Manage Projects</a>
+                        <a href="tasks.php" class="btn btn-primary" style="text-decoration: none; color: #ffffff;">Manage Tasks</a>
+                    </div>
+                <?php else: ?>
+                    <p>Welcome to your workspace. View and manage your assigned tasks.</p>
+                    <div style="margin-top: 30px;">
+                        <a href="my_tasks.php" class="btn btn-primary" style="text-decoration: none;">View My Tasks</a>
+                    </div>
+                <?php endif; ?>
             </div>
         </main>
     </div>
