@@ -7,7 +7,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     die("Access Denied");
 }
 
-$sql = "SELECT employees.*, users.email FROM employees JOIN users ON employees.user_id = users.id";
+$sql = "SELECT employees.*, users.email, users.is_active FROM employees JOIN users ON employees.user_id = users.id";
 $stmt = $pdo->query($sql);
 $employees = $stmt->fetchAll();
 ?>
@@ -75,6 +75,7 @@ $employees = $stmt->fetchAll();
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -91,6 +92,13 @@ $employees = $stmt->fetchAll();
                             </td>
                             <td><?= htmlspecialchars($emp['email']) ?></td>
                             <td><?= htmlspecialchars($emp['phone']) ?></td>
+                            <td>
+                                <?php if ($emp['is_active'] == 1): ?>
+                                    <span class="status-badge status-active">Active</span>
+                                <?php else: ?>
+                                    <span class="status-badge status-inactive">Inactive</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <div class="action-buttons">
                                     <a href="employee_edit.php?id=<?= $emp['id'] ?>" class="btn-icon-action btn-edit" title="Edit">

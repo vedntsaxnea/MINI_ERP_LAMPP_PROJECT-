@@ -12,6 +12,12 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
 $success_message = '';
 $error_message = '';
 
+// Check for success message in session
+if (isset($_SESSION['success'])) {
+    $success_message = $_SESSION['success'];
+    unset($_SESSION['success']);
+}
+
 // Fetch Projects for the dropdown
 try {
     $projects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetchAll();
@@ -30,26 +36,28 @@ try {
 
 // Handle Form Submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $project_id = isset($_POST['project_id']) && $_POST['project_id'] !== '' ? trim($_POST['project_id']) : null;
-    $assigned_to = isset($_POST['assigned_to']) && $_POST['assigned_to'] !== '' ? trim($_POST['assigned_to']) : null;
+    $project_id = isset($_POST['project_id']) && !empty($_POST['project_id']) ? intval($_POST['project_id']) : 0;
+    $assigned_to = isset($_POST['assigned_to']) && !empty($_POST['assigned_to']) ? intval($_POST['assigned_to']) : 0;
     $name = isset($_POST['name']) ? trim($_POST['name']) : '';
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
     $priority = isset($_POST['priority']) ? trim($_POST['priority']) : 'medium';
-    $due_date = isset($_POST['due_date']) ? trim($_POST['due_date']) : '';
+    $due_date = isset($_POST['due_date']) && !empty($_POST['due_date']) ? trim($_POST['due_date']) : NULL;
 
     // Validation
     if (empty($name)) {
         $error_message = 'Task name is required.';
-    } elseif ($project_id === null || $project_id === '') {
-        $error_message = 'Please select a project.';
-    } elseif ($assigned_to === null || $assigned_to === '') {
-        $error_message = 'Please assign the task to an employee.';
+    } elseif ($project_id <= 0) {
+        $error_message = 'Please select a valid project.';
+    } elseif ($assigned_to <= 0) {
+        $error_message = 'Please assign the task to a valid employee.';
     } else {
         try {
             $sql = "INSERT INTO tasks (project_id, assigned_to, name, description, priority, due_date) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$project_id, $assigned_to, $name, $description, $priority, $due_date]);
-            $success_message = 'Task assigned successfully!';
+            $_SESSION['success'] = 'Task assigned successfully!';
+            header('Location: tasks.php');
+            exit;
         } catch (PDOException $e) {
             $error_message = 'Error creating task: ' . htmlspecialchars($e->getMessage());
         }

@@ -39,12 +39,19 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 try {
     // Fetch user from database
-    $stmt = $pdo->prepare("SELECT id, email, password, Role FROM users WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT id, email, password, Role, is_active FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    // Verify user and password
+    // Verify user exists and password is correct
     if ($user && password_verify($password, $user['password'])) {
+        // Check if user account is active
+        if ($user['is_active'] == 0) {
+            $_SESSION['error'] = 'Your account has been deactivated. Please contact your administrator.';
+            header('Location: login.php');
+            exit;
+        }
+        
         // Regenerate session ID to prevent session fixation
         session_regenerate_id(true);
         

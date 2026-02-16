@@ -18,7 +18,7 @@ $error = '';
 $success = '';
 
 // Get the employee and user_id
-$stmt = $pdo->prepare("SELECT employees.*, users.email FROM employees JOIN users ON employees.user_id = users.id WHERE employees.id = ?");
+$stmt = $pdo->prepare("SELECT employees.*, users.email, users.is_active FROM employees JOIN users ON employees.user_id = users.id WHERE employees.id = ?");
 $stmt->execute([$id]);
 $emp = $stmt->fetch();
 
@@ -26,25 +26,16 @@ if (!$emp) {
     die("Employee not found!");
 }
 
-// Handle deletion
+// Handle deactivation (soft delete)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
     try {
-        $pdo->beginTransaction();
-
-        // Delete from employees table (cascading should handle this, but explicit is safer)
-        $deleteEmp = $pdo->prepare("DELETE FROM employees WHERE id = ?");
-        $deleteEmp->execute([$id]);
-
-        // Delete from users table
-        $deleteUser = $pdo->prepare("DELETE FROM users WHERE id = ?");
-        $deleteUser->execute([$emp['user_id']]);
-
-        $pdo->commit();
+        // Deactivate the user instead of deleting
+        $deactivateUser = $pdo->prepare("UPDATE users SET is_active = 0 WHERE id = ?");
+        $deactivateUser->execute([$emp['user_id']]);
         
         header("refresh:2;url=employees.php");
-        $success = "Employee deleted successfully! Redirecting...";
+        $success = "Employee deactivated successfully! They will no longer be able to login. Redirecting...";
     } catch (Exception $e) {
-        $pdo->rollBack();
         $error = "Error: " . $e->getMessage();
     }
 }
@@ -67,9 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     </svg>
-                    Delete Employee
+                    Deactivate Employee
                 </h1>
-                <p class="subtitle">Confirm employee deletion</p>
+                <p class="subtitle">Block employee access to the system</p>
             </div>
         </div>
 
@@ -104,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
                     </div>
 
                     <h2>Are you sure?</h2>
-                    <p class="warning-text">This action cannot be undone. You are about to permanently delete the following employee:</p>
+                    <p class="warning-text">You are about to deactivate the following employee. They will no longer be able to login to the system:</p>
 
                     <div class="employee-details">
                         <div class="detail-row">
@@ -132,10 +123,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
                         <div class="form-actions">
                             <button type="submit" class="btn btn-danger btn-large">
                                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                                 </svg>
-                                Delete Permanently
+                                Deactivate Employee
                             </button>
                             <a href="employees.php" class="btn btn-secondary btn-large">
                                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
