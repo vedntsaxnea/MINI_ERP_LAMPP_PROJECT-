@@ -62,13 +62,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Employee - Footprints</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <?php include 'head.php'; ?>
 </head>
 <body>
-    <div class="employees-container">
+    <?php include 'navbar.php'; ?>
+    <div class="container-fluid mt-4">
         <div class="header-section">
             <div class="header-content">
                 <h1>
@@ -215,5 +214,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </form>
         </div>
     </div>
+    <?php include 'footer.php'; ?>
 </body>
 </html>

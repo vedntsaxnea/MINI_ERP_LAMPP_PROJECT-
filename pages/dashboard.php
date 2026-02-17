@@ -12,53 +12,49 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Mini ERP</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <?php include 'head.php'; ?>
 </head>
 <body>
-    <div class="dashboard-container">
-        <header>
-            <h1>Welcome to MiniERP Dashboard</h1>
-            <div class="user-info">
-                <span>Logged in as: <strong><?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?></strong></span>
-                <span>Role: <strong><?php echo htmlspecialchars($_SESSION['role'], ENT_QUOTES, 'UTF-8'); ?></strong></span>
-                <a href="logout.php" class="logout-btn">Logout</a>
+    <?php include 'navbar.php'; ?>
+    <div class="container mt-5" style = "background:rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(25px);
+    padding: 35px 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    margin-bottom: 25px;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4" style = "color: rgb(255, 255, 255);">Welcome to MiniERP Dashboard</h1>
             </div>
-        </header>
+        </div>
         
-        <nav class="main-nav">
-            <ul>
-                <li><a href="dashboard.php" class="active">Dashboard</a></li>
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4" style = "color: rgb(255, 255, 255);">Dashboard Overview</h2>
                 <?php if ($_SESSION['role'] == 'admin'): ?>
-                    <li><a href="employees.php">Employees</a></li>
-                    <li><a href="projects.php">Projects</a></li>
-                    <li><a href="tasks.php">Tasks</a></li>
-                <?php else: ?>
-                    <li><a href="my_tasks.php">My Tasks</a></li>
-                <?php endif; ?>
-            </ul>
-        </nav>
-        
-        <main>
-            <div class="dashboard-content">
-                <h2>Dashboard Overview</h2>
-                <?php if ($_SESSION['role'] == 'admin'): ?>
-                    <p>Welcome to your Mini ERP system. Select a menu option to get started.</p>
-                    <div style="margin-top: 30px;">
-                        <a href="employees.php" class="btn btn-primary" style="margin-right: 10px; text-decoration: none; color: #ffffff;">Manage Employees</a>
-                        <a href="projects.php" class="btn btn-primary" style="margin-right: 10px; text-decoration: none; color: #ffffff;">Manage Projects</a>
-                        <a href="tasks.php" class="btn btn-primary" style="text-decoration: none; color: #ffffff;">Manage Tasks</a>
+                    <p class="mb-4" style = "color: rgb(255, 255, 255);">Welcome to your Mini ERP system. Select a menu option to get started.</p>
+                    <div class="d-flex gap-3">
+                        <a href="employees.php" class="btn btn-primary">Manage Employees</a>
+                        <a href="projects.php" class="btn btn-primary">Manage Projects</a>
+                        <a href="tasks.php" class="btn btn-primary">Manage Tasks</a>
                     </div>
                 <?php else: ?>
-                    <p>Welcome to your workspace. View and manage your assigned tasks.</p>
-                    <div style="margin-top: 30px;">
-                        <a href="my_tasks.php" class="btn btn-primary" style="text-decoration: none;">View My Tasks</a>
+                    <p class="mb-4" style = "color: rgb(255, 255, 255);">Welcome to your workspace. View and manage your assigned tasks.</p>
+                    <div>
+                        <a href="my_tasks.php" class="btn btn-primary">View My Tasks</a>
                     </div>
                 <?php endif; ?>
             </div>
-        </main>
+        </div>
     </div>
+    <?php include 'footer.php'; ?>
 </body>
 </html>

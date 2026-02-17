@@ -81,13 +81,12 @@ try {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Management - Footprints</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <?php include 'head.php'; ?>
 </head>
 <body>
-    <div class="tasks-container">
+    <?php include 'navbar.php'; ?>
+    <div class="container-fluid mt-4">
         <div class="header-section">
             <div class="header-content">
                 <h1>
@@ -285,5 +284,6 @@ try {
             <?php endif; ?>
         </div>
     </div>
+    <?php include 'footer.php'; ?>
 </body>
 </html>

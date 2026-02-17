@@ -105,10 +105,8 @@ foreach ($tasks as $task) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Tasks - Footprints</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>My Tasks - Mini ERP</title>
+    <?php include 'head.php'; ?>
     <style>
         .stats-grid {
             display: grid;
@@ -244,9 +242,10 @@ foreach ($tasks as $task) {
     </style>
 </head>
 <body>
-    <div class="tasks-container">
-        <div class="header-section">
-            <div class="header-content">
+    <?php include 'navbar.php'; ?>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
                 <h1>
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 11l3 3L22 4"></path>
@@ -369,5 +368,6 @@ foreach ($tasks as $task) {
             <?php endif; ?>
         </div>
     </div>
+    <?php include 'footer.php'; ?>
 </body>
 </html>
