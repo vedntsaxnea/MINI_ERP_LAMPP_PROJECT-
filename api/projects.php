@@ -41,7 +41,8 @@ function validateProjectInput($input) {
 // GET: Retrieve all projects
 if ($method == 'GET') {
     try {
-        $stmt = $pdo->query("SELECT * FROM projects ORDER BY id DESC");
+        $stmt = $pdo->prepare("SELECT * FROM projects ORDER BY id DESC");
+        $stmt->execute();
         $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($projects);
     } catch (Exception $e) {

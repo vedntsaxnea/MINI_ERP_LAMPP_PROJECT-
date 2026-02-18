@@ -20,7 +20,9 @@ if (isset($_SESSION['success'])) {
 
 // Fetch Projects for the dropdown
 try {
-    $projects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetchAll();
+    $stmt = $pdo->prepare("SELECT id, name FROM projects ORDER BY name ASC");
+    $stmt->execute();
+    $projects = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error_message = 'Error fetching projects: ' . htmlspecialchars($e->getMessage());
     $projects = [];
@@ -28,7 +30,9 @@ try {
 
 // Fetch Employees for the dropdown
 try {
-    $employees = $pdo->query("SELECT id, first_name, last_name FROM employees ORDER BY first_name ASC")->fetchAll();
+    $stmt = $pdo->prepare("SELECT id, first_name, last_name FROM employees ORDER BY first_name ASC");
+    $stmt->execute();
+    $employees = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error_message = 'Error fetching employees: ' . htmlspecialchars($e->getMessage());
     $employees = [];
@@ -71,7 +75,9 @@ try {
             JOIN projects ON tasks.project_id = projects.id 
             LEFT JOIN employees ON tasks.assigned_to = employees.id
             ORDER BY tasks.id DESC";
-    $tasks = $pdo->query($sql)->fetchAll();
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $tasks = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error_message = 'Error fetching tasks: ' . htmlspecialchars($e->getMessage());
     $tasks = [];

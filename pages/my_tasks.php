@@ -72,19 +72,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_id']) && isset($_
 $tasks = [];
 if ($employee_id) {
     try {
-        $sql = "SELECT * FROM tasks WHERE assigned_to = ? ORDER BY id DESC";
+        $sql = "SELECT tasks.*, projects.name as project_name 
+                FROM tasks 
+                JOIN projects ON tasks.project_id = projects.id 
+                WHERE tasks.assigned_to = ? 
+                ORDER BY tasks.id DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$employee_id]);
-        $raw_tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        // Now join with projects
-        foreach ($raw_tasks as $task) {
-            $proj_stmt = $pdo->prepare("SELECT name FROM projects WHERE id = ?");
-            $proj_stmt->execute([$task['project_id']]);
-            $proj = $proj_stmt->fetch(PDO::FETCH_ASSOC);
-            $task['project_name'] = $proj ? $proj['name'] : 'Unknown Project';
-            $tasks[] = $task;
-        }
+        $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         $error_message = 'Error fetching tasks: ' . htmlspecialchars($e->getMessage());
     }
@@ -345,7 +340,7 @@ foreach ($tasks as $task) {
                         </div>
                         
                         <form method="POST" class="status-update-form">
-                            <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                            <input type="hidden" name="task_id" value="<?php echo htmlspecialchars($task['id']); ?>">
                             <select name="status" required>
                                 <option value="pending" <?php echo $task['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
                                 <option value="in_progress" <?php echo $task['status'] == 'in_progress' ? 'selected' : ''; ?>>In Progress</option>

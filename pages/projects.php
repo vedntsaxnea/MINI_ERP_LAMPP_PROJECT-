@@ -35,7 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Fetch existing projects
 try {
-    $stmt = $pdo->query("SELECT * FROM projects ORDER BY id DESC");
+    $stmt = $pdo->prepare("SELECT * FROM projects ORDER BY id DESC");
+    $stmt->execute();
     $projects = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error_message = 'Error fetching projects: ' . htmlspecialchars($e->getMessage());
