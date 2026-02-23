@@ -43,8 +43,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                     <p class="mb-4" style = "color: rgb(255, 255, 255);">Welcome to your Mini ERP system. Select a menu option to get started.</p>
                     <div class="d-flex gap-3">
                         <a href="employees.php" class="btn btn-primary">Manage Employees</a>
-                        <a href="projects.php" class="btn btn-primary">Manage Projects</a>
-                        <a href="tasks.php" class="btn btn-primary">Manage Tasks</a>
+                        <a href="all_projects.php" class="btn btn-primary"> All Projects</a>
+                        <a href="all_tasks.php" class="btn btn-primary"> All Tasks</a>
                     </div>
                 <?php else: ?>
                     <p class="mb-4" style = "color: rgb(255, 255, 255);">Welcome to your workspace. View and manage your assigned tasks.</p>

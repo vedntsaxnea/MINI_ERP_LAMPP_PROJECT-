@@ -12,6 +12,21 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     exit;
 }
 
+// Ensure a default admin exists (only if missing)
+$default_admin_email = 'admin@test.com';
+$default_admin_password = 'admin123';
+try {
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ?');
+    $stmt->execute([$default_admin_email]);
+    if (!$stmt->fetch()) {
+        $hash = password_hash($default_admin_password, PASSWORD_DEFAULT);
+        $insert = $pdo->prepare('INSERT INTO users (email, password, Role) VALUES (?, ?, ?)');
+        $insert->execute([$default_admin_email, $hash, 'admin']);
+    }
+} catch (PDOException $e) {
+    error_log('Admin auto-create failed: ' . $e->getMessage());
+}
+
 // Generate CSRF token if not exists
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -46,7 +61,7 @@ if (!isset($_SESSION['csrf_token'])) {
             </div>
             <div class="form-group">
                 <label for="password">Password </label>
-                <input type="password" id="password" name="password"  placeholder="Password" required>
+                <input type="password" id="password" name="password" placeholder="Password" required>
             </div>
             <button type="submit">Login</button>
         </form>

@@ -15,8 +15,8 @@ if (session_status() === PHP_SESSION_NONE) {
         <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
         <?php if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
             <li class="nav-item"><a class="nav-link" href="employees.php">Employees</a></li>
-            <li class="nav-item"><a class="nav-link" href="projects.php">Projects</a></li>
-            <li class="nav-item"><a class="nav-link" href="tasks.php">Tasks</a></li>
+          <li class="nav-item"><a class="nav-link" href="all_projects.php">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="all_tasks.php">Tasks</a></li>
         <?php else: ?>
             <li class="nav-item"><a class="nav-link" href="my_tasks.php">My Tasks</a></li>
         <?php endif; ?>
