@@ -56,11 +56,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = 'Please assign the task to a valid employee.';
     } else {
         try {
-            // Check if task with same name already exists
-            $checkStmt = $pdo->prepare("SELECT id FROM tasks WHERE LOWER(name) = LOWER(?)");
-            $checkStmt->execute([$name]);
+            // Check if task with same name already exists in the selected project
+            $checkStmt = $pdo->prepare("SELECT id FROM tasks WHERE project_id = ? AND LOWER(name) = LOWER(?)");
+            $checkStmt->execute([$project_id, $name]);
             if ($checkStmt->fetch()) {
-                $error_message = 'A task with this name already exists. Please use a different name.';
+                $error_message = 'A task with this name already exists in the selected project. Please use a different name.';
             } else {
                 $sql = "INSERT INTO tasks (project_id, assigned_to, name, description, priority, due_date) VALUES (?, ?, ?, ?, ?, ?)";
                 $stmt = $pdo->prepare($sql);
