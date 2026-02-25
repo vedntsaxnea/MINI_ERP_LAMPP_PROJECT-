@@ -24,9 +24,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = 'Project name is required.';
     } else {
         try {
-            $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, status) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$name, $description, $start_date, $status]);
-            $success_message = 'Project created successfully!';
+            // Check if project with same name already exists
+            $checkStmt = $pdo->prepare("SELECT id FROM projects WHERE LOWER(name) = LOWER(?)");
+            $checkStmt->execute([$name]);
+            if ($checkStmt->fetch()) {
+                $error_message = 'A project with this name already exists. Please use a different name.';
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, status) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$name, $description, $start_date, $status]);
+                $success_message = 'Project created successfully!';
+            }
         } catch (PDOException $e) {
             $error_message = 'Error creating project: ' . htmlspecialchars($e->getMessage());
         }
@@ -65,7 +72,7 @@ try {
                 </h1>
                 <p class="subtitle">Manage your projects efficiently</p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="dashboard.php" class="btn btn-secondary">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -173,6 +180,7 @@ try {
                 <span>Total Projects: <strong><?php echo count($projects); ?></strong></span>
             </div>
 
+            <div class="table-responsive">
             <table class="employee-table">
                 <thead>
                     <tr>
@@ -199,6 +207,7 @@ try {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
             <?php else: ?>
             <div class="empty-state">
                 <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

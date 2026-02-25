@@ -26,16 +26,40 @@ if (!$emp) {
     die("Employee not found!");
 }
 
+$statusValue = isset($emp['status']) ? strtolower((string)$emp['status']) : '';
+$isCurrentlyActive = (
+    (isset($emp['is_active']) && (int)$emp['is_active'] === 1) ||
+    $statusValue === 'active' ||
+    $statusValue === '1'
+);
+
+$actionLabel = $isCurrentlyActive ? 'Deactivate' : 'Activate';
+$targetUserActive = $isCurrentlyActive ? 0 : 1;
+$targetEmployeeStatus = $isCurrentlyActive ? 'inactive' : 'active';
+
 // Handle deactivation (soft delete)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
     try {
-        // Deactivate the user instead of deleting
-        $deactivateUser = $pdo->prepare("UPDATE users SET is_active = 0 WHERE id = ?");
-        $deactivateUser->execute([$emp['user_id']]);
+        $pdo->beginTransaction();
+
+        $updateUser = $pdo->prepare("UPDATE users SET is_active = ? WHERE id = ?");
+        $updateUser->execute([$targetUserActive, $emp['user_id']]);
+
+        $updateEmployee = $pdo->prepare("UPDATE employees SET status = ? WHERE id = ?");
+        $updateEmployee->execute([$targetEmployeeStatus, $emp['id']]);
+
+        $pdo->commit();
         
         header("refresh:2;url=employees.php");
-        $success = "Employee deactivated successfully! They will no longer be able to login. Redirecting...";
+        if ($targetUserActive === 0) {
+            $success = "Employee marked as inactive successfully! They will no longer be able to login. Redirecting...";
+        } else {
+            $success = "Employee marked as active successfully! They can login again. Redirecting...";
+        }
     } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         $error = "Error: " . $e->getMessage();
     }
 }
@@ -47,9 +71,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delete Employee - Footprints</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+    <div class="container-fluid py-3">
     <div class="employees-container">
         <div class="header-section">
             <div class="header-content">
@@ -58,9 +84,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     </svg>
-                    Deactivate Employee
+                    <?= htmlspecialchars($actionLabel) ?> Employee
                 </h1>
-                <p class="subtitle">Block employee access to the system</p>
+                <p class="subtitle">Update employee access status in the system</p>
             </div>
         </div>
 
@@ -95,7 +121,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
                     </div>
 
                     <h2>Are you sure?</h2>
-                    <p class="warning-text">You are about to deactivate the following employee. They will no longer be able to login to the system:</p>
+                    <?php if ($isCurrentlyActive): ?>
+                        <p class="warning-text">You are about to set the following employee as inactive. They will no longer be able to login to the system:</p>
+                    <?php else: ?>
+                        <p class="warning-text">You are about to set the following employee as active. They will be able to login to the system again:</p>
+                    <?php endif; ?>
 
                     <div class="employee-details">
                         <div class="detail-row">
@@ -120,13 +150,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
 
                     <form method="POST" class="delete-form">
                         <input type="hidden" name="confirm_delete" value="1">
-                        <div class="form-actions">
+                        <div class="form-actions d-flex flex-wrap gap-2">
                             <button type="submit" class="btn btn-danger btn-large">
                                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                                 </svg>
-                                Deactivate Employee
+                                <?= htmlspecialchars($actionLabel) ?> Employee
                             </button>
                             <a href="employees.php" class="btn btn-secondary btn-large">
                                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -141,5 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
             <?php endif; ?>
         </div>
     </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

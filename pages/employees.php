@@ -35,7 +35,7 @@ $employees = $stmt->fetchAll();
                 </h1>
                 <p class="subtitle">Manage your team members efficiently</p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="dashboard.php" class="btn btn-secondary">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -69,6 +69,7 @@ $employees = $stmt->fetchAll();
                     <a href="employee_create.php" class="btn btn-primary">Add Employee</a>
                 </div>
             <?php else: ?>
+                <div class="table-responsive">
                 <table class="employee-table">
                     <thead>
                         <tr>
@@ -119,6 +120,7 @@ $employees = $stmt->fetchAll();
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             <?php endif; ?>
         </div>
     </div>

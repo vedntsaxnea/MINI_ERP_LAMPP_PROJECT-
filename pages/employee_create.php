@@ -30,10 +30,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $pdo->beginTransaction();
 
             // Check if email already exists
-            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?)");
             $checkStmt->execute([$email]);
             if ($checkStmt->fetch()) {
-                throw new Exception("Email already exists!");
+                throw new Exception("An employee with this email address already exists. Please use a different email.");
             }
 
             // 1. Insert into Users Table
@@ -81,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </h1>
                 <p class="subtitle">Create a new employee account</p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="employees.php" class="btn btn-secondary">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -194,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
 
-                <div class="form-actions">
+                <div class="form-actions d-flex flex-wrap gap-2">
                     <button type="submit" class="btn btn-primary btn-large">
                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>

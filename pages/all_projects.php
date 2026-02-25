@@ -40,7 +40,7 @@ try {
                 <h1>All Projects</h1>
                 <p class="subtitle">View all projects in one page</p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="dashboard.php" class="btn btn-secondary">Dashboard</a>
                 <a href="projects.php" class="btn btn-primary">Add New Project</a>
             </div>
@@ -56,6 +56,7 @@ try {
                 <span>Total Projects: <strong><?php echo count($projects); ?></strong></span>
             </div>
 
+            <div class="table-responsive">
             <table class="employee-table">
                 <thead>
                     <tr>
@@ -82,6 +83,7 @@ try {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
             <?php else: ?>
             <div class="empty-state">
                 <h3>No Projects Found</h3>

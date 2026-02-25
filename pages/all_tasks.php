@@ -45,7 +45,7 @@ try {
                 <h1>All Tasks</h1>
                 <p class="subtitle">View all tasks in one page</p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="dashboard.php" class="btn btn-secondary">Dashboard</a>
                 <a href="tasks.php" class="btn btn-primary">Add New Task</a>
             </div>
@@ -61,6 +61,7 @@ try {
                 <span>Total Tasks: <strong><?php echo count($tasks); ?></strong></span>
             </div>
 
+            <div class="table-responsive">
             <table class="employee-table">
                 <thead>
                     <tr>
@@ -93,6 +94,7 @@ try {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
             <?php else: ?>
             <div class="empty-state">
                 <h3>No Tasks Found</h3>

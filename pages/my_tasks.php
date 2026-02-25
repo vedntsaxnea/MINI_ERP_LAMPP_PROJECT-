@@ -250,7 +250,7 @@ foreach ($tasks as $task) {
                 </h1>
                 <p class="subtitle">View and manage your assigned tasks</p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="dashboard.php" class="btn btn-secondary">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -339,7 +339,7 @@ foreach ($tasks as $task) {
                             </div>
                         </div>
                         
-                        <form method="POST" class="status-update-form">
+                        <form method="POST" class="status-update-form d-flex flex-wrap gap-2">
                             <input type="hidden" name="task_id" value="<?php echo htmlspecialchars($task['id']); ?>">
                             <select name="status" required>
                                 <option value="pending" <?php echo $task['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>

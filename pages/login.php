@@ -38,33 +38,41 @@ if (!isset($_SESSION['csrf_token'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Mini ERP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+                <div class="login-container">
+        <h2 class="text-center">Login</h2>
         <?php 
         if(isset($_SESSION['error'])) { 
-            echo "<p class='error'>" . htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8') . "</p>"; 
+            echo "<p class='error alert alert-danger text-center'>" . htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8') . "</p>"; 
             unset($_SESSION['error']); 
         } 
         if(isset($_SESSION['success'])) { 
-            echo "<p class='success'>" . htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8') . "</p>"; 
+            echo "<p class='success alert alert-success text-center'>" . htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8') . "</p>"; 
             unset($_SESSION['success']); 
         } 
         ?>
-        <form action="auth_login.php" method="POST">
+        <form action="auth_login.php" method="POST" class="w-100">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Email" required>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-4">
                 <label for="password">Password </label>
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" class="btn btn-primary d-block mx-auto px-5">Submit</button>
         </form>
+                </div>
+            </div>
+        </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
