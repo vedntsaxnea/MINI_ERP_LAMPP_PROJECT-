@@ -2,7 +2,6 @@
 session_start();
 require '../config/db.php';
 
-// Check if session and role are set
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     die("Access Denied");
 }
@@ -18,7 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = trim($_POST['phone']);
     $position = trim($_POST['position'] ?? '');
 
-    // Basic validation
     if (empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
         $error = "All fields except position are required!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -29,27 +27,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         try {
             $pdo->beginTransaction();
 
-            // Check if email already exists
             $checkStmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?)");
             $checkStmt->execute([$email]);
             if ($checkStmt->fetch()) {
                 throw new Exception("An employee with this email address already exists. Please use a different email.");
             }
 
-            // 1. Insert into Users Table
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO users (email, password, role) VALUES (?, ?, 'employee')");
             $stmt->execute([$email, $hashedPassword]);
             $user_id = $pdo->lastInsertId();
 
-            // 2. Insert into Employees Table
             $stmt = $pdo->prepare("INSERT INTO employees (user_id, first_name, last_name, phone, position) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$user_id, $first_name, $last_name, $phone, $position]);
 
             $pdo->commit();
             $success = "Employee created successfully!";
-            
-            // Redirect after 2 seconds
+
             header("refresh:2;url=employees.php");
         } catch (Exception $e) {
             $pdo->rollBack();

@@ -2,7 +2,6 @@
 session_start();
 require '../config/db.php';
 
-// Check if user is Admin
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     $_SESSION['error'] = 'Access Denied: Admin privileges required.';
     header('Location: dashboard.php');
@@ -12,13 +11,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
 $success_message = '';
 $error_message = '';
 
-// Check for success message in session
 if (isset($_SESSION['success'])) {
     $success_message = $_SESSION['success'];
     unset($_SESSION['success']);
 }
 
-// Fetch Projects for the dropdown
 try {
     $stmt = $pdo->prepare("SELECT id, name FROM projects ORDER BY name ASC");
     $stmt->execute();
@@ -28,7 +25,6 @@ try {
     $projects = [];
 }
 
-// Fetch Employees for the dropdown
 try {
     $stmt = $pdo->prepare("SELECT id, first_name, last_name FROM employees ORDER BY first_name ASC");
     $stmt->execute();
@@ -38,8 +34,24 @@ try {
     $employees = [];
 }
 
-// Handle Form Submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_task_status'])) {
+    $task_id = isset($_POST['task_id']) ? (int)$_POST['task_id'] : 0;
+    $new_status = isset($_POST['status']) ? trim($_POST['status']) : '';
+
+    if ($task_id <= 0 || !in_array($new_status, ['pending', 'in_progress', 'completed'], true)) {
+        $error_message = 'Invalid task status update request.';
+    } else {
+        try {
+            $updateStmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE id = ?");
+            $updateStmt->execute([$new_status, $task_id]);
+            $success_message = 'Task status updated successfully!';
+        } catch (PDOException $e) {
+            $error_message = 'Error updating task status: ' . htmlspecialchars($e->getMessage());
+        }
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['update_task_status'])) {
     $project_id = isset($_POST['project_id']) && !empty($_POST['project_id']) ? intval($_POST['project_id']) : 0;
     $assigned_to = isset($_POST['assigned_to']) && !empty($_POST['assigned_to']) ? intval($_POST['assigned_to']) : 0;
     $name = isset($_POST['name']) ? trim($_POST['name']) : '';
@@ -47,7 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $priority = isset($_POST['priority']) ? trim($_POST['priority']) : 'medium';
     $due_date = isset($_POST['due_date']) && !empty($_POST['due_date']) ? trim($_POST['due_date']) : NULL;
 
-    // Validation
     if (empty($name)) {
         $error_message = 'Task name is required.';
     } elseif ($project_id <= 0) {
@@ -56,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = 'Please assign the task to a valid employee.';
     } else {
         try {
-            // Check if task with same name already exists in the selected project
             $checkStmt = $pdo->prepare("SELECT id FROM tasks WHERE project_id = ? AND LOWER(name) = LOWER(?)");
             $checkStmt->execute([$project_id, $name]);
             if ($checkStmt->fetch()) {
@@ -75,7 +85,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fetch Existing Tasks to display
 try {
     $sql = "SELECT tasks.*, projects.name as project_name, employees.first_name, employees.last_name 
             FROM tasks 
@@ -129,7 +138,6 @@ try {
             </div>
         </div>
 
-        <!-- Form Section -->
         <div id="task-form-section" class="table-container">
             <h3 style="color: #ffffff; margin-bottom: 25px; font-size: 20px;">Assign New Task</h3>
             
@@ -243,7 +251,6 @@ try {
             </form>
         </div>
 
-        <!-- Tasks Table Section -->
         <div class="table-container">
             <h3 style="color: #ffffff; margin-bottom: 25px; font-size: 20px;">All Tasks</h3>
             
@@ -277,9 +284,17 @@ try {
                         </td>
                         <td><?php echo htmlspecialchars($t['due_date'] ?? 'N/A'); ?></td>
                         <td>
-                            <span class="status-badge status-<?php echo htmlspecialchars($t['status']); ?>">
-                                <?php echo htmlspecialchars(ucfirst($t['status'])); ?>
-                            </span>
+                            <form method="POST" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="task_id" value="<?php echo htmlspecialchars($t['id']); ?>">
+                                <span class="status-badge status-<?php echo htmlspecialchars($t['status']); ?>">
+                                    <select name="status" style="background: transparent; border: none; color: inherit; font: inherit; padding: 0; cursor: pointer;">
+                                        <option value="pending" <?php echo $t['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                        <option value="in_progress" <?php echo $t['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                                        <option value="completed" <?php echo $t['status'] === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                                    </select>
+                                </span>
+                                <button type="submit" name="update_task_status" class="btn btn-outline-light btn-sm">Save</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -302,3 +317,4 @@ try {
     <?php include 'footer.php'; ?>
 </body>
 </html>
+

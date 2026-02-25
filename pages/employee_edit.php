@@ -2,12 +2,10 @@
 session_start();
 require '../config/db.php';
 
-// Check if session and role are set
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     die("Access Denied");
 }
 
-// Check if ID is provided
 if (!isset($_GET['id'])) {
     header("Location: employees.php");
     exit;
@@ -17,7 +15,6 @@ $id = intval($_GET['id']);
 $error = '';
 $success = '';
 
-// Fetch existing data
 $stmt = $pdo->prepare("SELECT employees.*, users.email FROM employees JOIN users ON employees.user_id = users.id WHERE employees.id = ?");
 $stmt->execute([$id]);
 $emp = $stmt->fetch();
@@ -32,7 +29,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = trim($_POST['phone']);
     $position = trim($_POST['position'] ?? '');
 
-    // Basic validation
     if (empty($first_name) || empty($last_name)) {
         $error = "First name and last name are required!";
     } elseif (strlen($phone) > 15) {
@@ -42,8 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update = $pdo->prepare("UPDATE employees SET first_name=?, last_name=?, phone=?, position=? WHERE id=?");
             $update->execute([$first_name, $last_name, $phone, $position, $id]);
             $success = "Employee updated successfully!";
-            
-            // Refresh employee data
+
             $stmt = $pdo->prepare("SELECT employees.*, users.email FROM employees JOIN users ON employees.user_id = users.id WHERE employees.id = ?");
             $stmt->execute([$id]);
             $emp = $stmt->fetch();

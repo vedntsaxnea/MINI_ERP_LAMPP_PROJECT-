@@ -1,18 +1,15 @@
 <?php 
 require_once '../config/db.php'; 
 
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Redirect if already logged in
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     header('Location: dashboard.php');
     exit;
 }
 
-// Ensure a default admin exists (only if missing)
 $default_admin_email = 'admin@test.com';
 $default_admin_password = 'admin123';
 try {
@@ -27,7 +24,6 @@ try {
     error_log('Admin auto-create failed: ' . $e->getMessage());
 }
 
-// Generate CSRF token if not exists
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }

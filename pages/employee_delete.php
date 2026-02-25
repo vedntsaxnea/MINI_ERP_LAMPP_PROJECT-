@@ -2,12 +2,10 @@
 session_start();
 require '../config/db.php';
 
-// Check if session and role are set
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     die("Access Denied");
 }
 
-// Check if ID is provided
 if (!isset($_GET['id'])) {
     header("Location: employees.php");
     exit;
@@ -17,7 +15,6 @@ $id = intval($_GET['id']);
 $error = '';
 $success = '';
 
-// Get the employee and user_id
 $stmt = $pdo->prepare("SELECT employees.*, users.email, users.is_active FROM employees JOIN users ON employees.user_id = users.id WHERE employees.id = ?");
 $stmt->execute([$id]);
 $emp = $stmt->fetch();
@@ -37,7 +34,6 @@ $actionLabel = $isCurrentlyActive ? 'Deactivate' : 'Activate';
 $targetUserActive = $isCurrentlyActive ? 0 : 1;
 $targetEmployeeStatus = $isCurrentlyActive ? 'inactive' : 'active';
 
-// Handle deactivation (soft delete)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_delete'])) {
     try {
         $pdo->beginTransaction();

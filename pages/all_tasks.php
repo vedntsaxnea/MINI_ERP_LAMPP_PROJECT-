@@ -14,7 +14,25 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     exit;
 }
 
+$success_message = '';
 $error_message = '';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_task_status'])) {
+    $task_id = isset($_POST['task_id']) ? (int)$_POST['task_id'] : 0;
+    $new_status = isset($_POST['status']) ? trim($_POST['status']) : '';
+
+    if ($task_id <= 0 || !in_array($new_status, ['pending', 'in_progress', 'completed'], true)) {
+        $error_message = 'Invalid task status update request.';
+    } else {
+        try {
+            $updateStmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE id = ?");
+            $updateStmt->execute([$new_status, $task_id]);
+            $success_message = 'Task status updated successfully!';
+        } catch (PDOException $e) {
+            $error_message = 'Error updating task status: ' . htmlspecialchars($e->getMessage());
+        }
+    }
+}
 
 try {
     $sql = "SELECT tasks.*, projects.name AS project_name, employees.first_name, employees.last_name
@@ -56,6 +74,10 @@ try {
             <div class="alert alert-error"><?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
+            <?php if (!empty($success_message)): ?>
+            <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
+            <?php endif; ?>
+
             <?php if (!empty($tasks)): ?>
             <div class="employee-count">
                 <span>Total Tasks: <strong><?php echo count($tasks); ?></strong></span>
@@ -86,9 +108,17 @@ try {
                         </td>
                         <td><?php echo htmlspecialchars($task['due_date'] ?? 'N/A'); ?></td>
                         <td>
-                            <span class="status-badge status-<?php echo htmlspecialchars($task['status']); ?>">
-                                <?php echo htmlspecialchars(ucfirst($task['status'])); ?>
-                            </span>
+                            <form method="POST" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="task_id" value="<?php echo htmlspecialchars($task['id']); ?>">
+                                <span class="status-badge status-<?php echo htmlspecialchars($task['status']); ?>">
+                                    <select name="status" style="background: transparent; border: none; color: inherit; font: inherit; padding: 0; cursor: pointer;">
+                                        <option value="pending" <?php echo $task['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                        <option value="in_progress" <?php echo $task['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                                        <option value="completed" <?php echo $task['status'] === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                                    </select>
+                                </span>
+                                <button type="submit" name="update_task_status" class="btn btn-outline-light btn-sm">Save</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -106,3 +136,4 @@ try {
     <?php include 'footer.php'; ?>
 </body>
 </html>
+

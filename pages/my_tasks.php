@@ -2,14 +2,12 @@
 session_start();
 require '../config/db.php';
 
-// Check if user is logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     $_SESSION['error'] = 'Please login to access this page.';
     header('Location: login.php');
     exit;
 }
 
-// Check if user is Employee
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'employee') {
     $_SESSION['error'] = 'Access Denied: This page is for employees only.';
     header('Location: dashboard.php');
@@ -19,13 +17,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'employee') {
 $success_message = '';
 $error_message = '';
 
-// Check for success message in session
 if (isset($_SESSION['success'])) {
     $success_message = $_SESSION['success'];
     unset($_SESSION['success']);
 }
 
-// Get employee ID from user_id
 $employee_id = null;
 try {
     $stmt = $pdo->prepare("SELECT id FROM employees WHERE user_id = ?");
@@ -40,14 +36,13 @@ try {
     $error_message = 'Error fetching employee data: ' . htmlspecialchars($e->getMessage());
 }
 
-// Handle Status Update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_id']) && isset($_POST['status'])) {
     $task_id = !empty($_POST['task_id']) ? intval($_POST['task_id']) : 0;
     $new_status = isset($_POST['status']) ? trim($_POST['status']) : null;
     
     if ($task_id > 0 && $new_status && in_array($new_status, ['pending', 'in_progress', 'completed'])) {
         try {
-            // Verify the task belongs to this employee
+
             $verify_stmt = $pdo->prepare("SELECT id FROM tasks WHERE id = ? AND assigned_to = ?");
             $verify_stmt->execute([$task_id, $employee_id]);
             
@@ -68,7 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_id']) && isset($_
     }
 }
 
-// Fetch Tasks Assigned to the Employee
 $tasks = [];
 if ($employee_id) {
     try {
@@ -85,7 +79,6 @@ if ($employee_id) {
     }
 }
 
-// Count tasks by status
 $pending_count = 0;
 $in_progress_count = 0;
 $completed_count = 0;
@@ -103,6 +96,30 @@ foreach ($tasks as $task) {
     <title>My Tasks - Mini ERP</title>
     <?php include 'head.php'; ?>
     <style>
+        .mytasks-title {
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .mytasks-title .icon {
+            width: 40px;
+            height: 40px;
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .mytasks-subtitle {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 15px;
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -239,16 +256,16 @@ foreach ($tasks as $task) {
 <body>
     <?php include 'navbar.php'; ?>
     <div class="container-fluid mt-4">
-        <div class="row">
-            <div class="col-12">
-                <h1>
+        <div class="header-section">
+            <div class="header-content">
+                <h1 class="mytasks-title">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 11l3 3L22 4"></path>
                         <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     My Tasks
                 </h1>
-                <p class="subtitle">View and manage your assigned tasks</p>
+                <p class="mytasks-subtitle">View and manage your assigned tasks</p>
             </div>
             <div class="header-actions d-flex flex-wrap gap-2">
                 <a href="dashboard.php" class="btn btn-secondary">
@@ -261,7 +278,7 @@ foreach ($tasks as $task) {
             </div>
         </div>
 
-        <!-- Alert Messages -->
+        
         <?php if (!empty($success_message)): ?>
         <div class="alert alert-success" style="margin: 20px 0;">
             <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -282,7 +299,7 @@ foreach ($tasks as $task) {
         </div>
         <?php endif; ?>
 
-        <!-- Statistics Cards -->
+        
         <div class="stats-grid">
             <div class="stat-card pending">
                 <h3>Pending</h3>
@@ -298,7 +315,7 @@ foreach ($tasks as $task) {
             </div>
         </div>
 
-        <!-- Tasks Display -->
+        
         <div class="table-container">
             <h3 style="color: #ffffff; margin-bottom: 25px; font-size: 20px;">All My Tasks</h3>
             
@@ -366,3 +383,4 @@ foreach ($tasks as $task) {
     <?php include 'footer.php'; ?>
 </body>
 </html>
+

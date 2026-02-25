@@ -2,7 +2,6 @@
 session_start();
 require '../config/db.php';
 
-// Check if user is Admin
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     $_SESSION['error'] = 'Access Denied: Admin privileges required.';
     header('Location: dashboard.php');
@@ -12,19 +11,33 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
 $success_message = '';
 $error_message = '';
 
-// Handle Form Submission (Create New Project)
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_project_status'])) {
+    $project_id = isset($_POST['project_id']) ? (int)$_POST['project_id'] : 0;
+    $new_status = isset($_POST['status']) ? trim($_POST['status']) : '';
+
+    if ($project_id <= 0 || !in_array($new_status, ['pending', 'active', 'completed'], true)) {
+        $error_message = 'Invalid project status update request.';
+    } else {
+        try {
+            $updateStmt = $pdo->prepare("UPDATE projects SET status = ? WHERE id = ?");
+            $updateStmt->execute([$new_status, $project_id]);
+            $success_message = 'Project status updated successfully!';
+        } catch (PDOException $e) {
+            $error_message = 'Error updating project status: ' . htmlspecialchars($e->getMessage());
+        }
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['update_project_status'])) {
     $name = isset($_POST['name']) ? trim($_POST['name']) : '';
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
     $start_date = isset($_POST['start_date']) ? trim($_POST['start_date']) : '';
     $status = isset($_POST['status']) ? trim($_POST['status']) : 'pending';
 
-    // Validation
     if (empty($name)) {
         $error_message = 'Project name is required.';
     } else {
         try {
-            // Check if project with same name already exists
             $checkStmt = $pdo->prepare("SELECT id FROM projects WHERE LOWER(name) = LOWER(?)");
             $checkStmt->execute([$name]);
             if ($checkStmt->fetch()) {
@@ -40,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fetch existing projects
 try {
     $stmt = $pdo->prepare("SELECT * FROM projects ORDER BY id DESC");
     $stmt->execute();
@@ -90,7 +102,7 @@ try {
             </div>
         </div>
 
-        <!-- Form Section -->
+        
         <div id="project-form-section" class="table-container">
             <h3 style="color: #ffffff; margin-bottom: 25px; font-size: 20px;">Add New Project</h3>
             
@@ -171,7 +183,7 @@ try {
             </form>
         </div>
 
-        <!-- Projects Table Section -->
+        
         <div class="table-container">
             <h3 style="color: #ffffff; margin-bottom: 25px; font-size: 20px;">All Projects</h3>
             
@@ -198,9 +210,17 @@ try {
                         <td><?php echo htmlspecialchars($p['name']); ?></td>
                         <td><?php echo htmlspecialchars(substr($p['description'], 0, 50)); ?><?php echo strlen($p['description']) > 50 ? '...' : ''; ?></td>
                         <td>
-                            <span class="status-badge status-<?php echo htmlspecialchars($p['status']); ?>">
-                                <?php echo htmlspecialchars(ucfirst($p['status'])); ?>
-                            </span>
+                            <form method="POST" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="project_id" value="<?php echo htmlspecialchars($p['id']); ?>">
+                                <span class="status-badge status-<?php echo htmlspecialchars($p['status']); ?>">
+                                    <select name="status" style="background: transparent; border: none; color: inherit; font: inherit; padding: 0; cursor: pointer;">
+                                        <option value="pending" <?php echo $p['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                        <option value="active" <?php echo $p['status'] === 'active' ? 'selected' : ''; ?>>Active</option>
+                                        <option value="completed" <?php echo $p['status'] === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                                    </select>
+                                </span>
+                                <button type="submit" name="update_project_status" class="btn btn-outline-light btn-sm">Save</button>
+                            </form>
                         </td>
                         <td><?php echo htmlspecialchars($p['start_date']); ?></td>
                     </tr>
@@ -224,3 +244,4 @@ try {
     <?php include 'footer.php'; ?>
 </body>
 </html>
+

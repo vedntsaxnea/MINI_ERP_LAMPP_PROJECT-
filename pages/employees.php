@@ -2,7 +2,6 @@
 session_start();
 require '../config/db.php';
 
-// Check if session and role are set
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     die("Access Denied");
 }
